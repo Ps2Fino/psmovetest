@@ -31,7 +31,7 @@ int main (int argc, char **argv)
 		printf("The serial number is: %s\n", serial_number);
 	}
 
-	psmove_enable_orientation(controller_1, PSMove_True);
+	// psmove_enable_orientation(controller_1, PSMove_True);
 	float x, y, z;
 	float counter = 0;
 	while(1) {
@@ -50,17 +50,30 @@ int main (int argc, char **argv)
 
 			if (norm >= 2)
 			{
-				counter += 0.2;
+				counter += 0.1;
 				char red = (char) floor(counter);
-				psmove_set_leds(controller_1, red, 0, 0);
-				psmove_update_leds(controller_1);
 				printf("RED: %.d\n", (int) red);
 			}
-			else {
-				psmove_set_leds(controller_1, 255, 255, 255);
-				psmove_update_leds(controller_1);				
+
+			if (counter > 100)
+			{
+				break;
 			}
+
+			psmove_set_leds(controller_1, (char) floor(counter), 0, 0);
+			psmove_update_leds(controller_1);			
 		}
+	}
+
+	while (1)
+	{
+		// Flash green
+		psmove_set_leds(controller_1, 0, 255, 0);
+		psmove_update_leds(controller_1);
+		sleep(1);
+		psmove_set_leds(controller_1, 255, 255, 255);
+		psmove_update_leds(controller_1);
+		sleep(1);
 	}
 
 	// Disconnect the controller
