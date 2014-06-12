@@ -8,12 +8,11 @@
 typedef struct game_struct {
 	PSMove *controller;
 	char *serial_number;
-	int counter;
+	float counter;
 } Game_Struct;
 
 void init(int id, Game_Struct *addr_struct)
 {
-	addr_struct = (Game_Struct*) malloc(sizeof(Game_Struct));
 	addr_struct->controller = NULL;
 	addr_struct->controller = psmove_connect_by_id(id);
 
@@ -47,44 +46,53 @@ int main (int argc, char **argv)
 	printf("Number of controllers: %d\n", numControllers);
 	// return 0;
 
-	Game_Struct **game_structs = NULL;
-	game_structs = (Game_Struct**) malloc(numControllers * sizeof(Game_Struct*));
+	Game_Struct *game_structs = NULL;
+	game_structs = (Game_Struct*) malloc(numControllers * sizeof(Game_Struct));
 
 	for (int i=0; i < numControllers; ++i)
 	{
-		game_structs[i] = NULL;
-		init(i, game_structs[i]);
+		init(i, &game_structs[i]);
 	}
+
+	// sleep(2);
+
+	printf("game_structs[0] serial_number: %s\n", game_structs[0].serial_number);
 
 	float x, y, z;
 	while(1) {
 		for (int i=0; i < numControllers; ++i)
 		{
-			PSMove *controller = game_structs[i]->controller;
+			PSMove *controller = game_structs[i].controller;
 			if (psmove_poll(controller))
 			{
 				psmove_get_accelerometer_frame(controller, Frame_SecondHalf, &x, &y, &z);
 				double x_sqr = pow(x, 2);
 				double y_sqr = pow(y, 2);
 				double z_sqr = pow(z, 2);
-				int counter = game_structs[i]->counter;
 
 				double norm = sqrt(x_sqr + y_sqr + z_sqr);
+				printf("Norm: %.2f\n", norm);
 				if (norm >= 2)
 				{
-					counter += 0.1;
-					game_structs[i]->counter = counter;
-					char red = (char) floor(counter);
-					printf("Controller %d: %.d\n", i, (int) red);
+					game_structs[i].counter += 0.1;
+					char red = (char) floor(game_structs[i].counter);
+					printf("Controller %d rising: %d\n", i, (int) red);
 				}
 
-				if (game_structs[i]->counter > 100)
+				if (game_structs[i].counter > 100)
 				{
 					break;
 				}
 
-				psmove_set_leds(controller, (char) floor(counter), 0, 0);
-				psmove_update_leds(controller);	
+				if (game_structs[i].counter > 0.02)
+				{
+					game_structs[i].counter -= 0.02;
+				}
+				psmove_set_leds(controller, (char) floor(game_structs[i].counter), 0, 0);
+				psmove_update_leds(controller);
+
+				char red = (char) floor(game_structs[i].counter);
+				printf("Controller %d descending: %d\n", i, (int) red);
 			}
 		}
 
@@ -94,9 +102,9 @@ int main (int argc, char **argv)
 	PSMove *blink_controller = NULL;
 	for (int i = 0; i < numControllers; ++i)
 	{
-		if (game_structs[i]->counter > 100)
+		if (game_structs[i].counter > 100)
 		{
-			blink_controller = game_structs[i]->controller;
+			blink_controller = game_structs[i].controller;
 			break;
 		}
 	}
@@ -115,7 +123,7 @@ int main (int argc, char **argv)
 	// Disconnect and free
 	for (int i = 0; i < numControllers; ++i)
 	{
-		destroy(game_structs[i]);
+		destroy(&game_structs[i]);
 	}
 
 	blink_controller = NULL;
