@@ -20,9 +20,14 @@ void init(int id, Game_Struct *addr_struct)
 	addr_struct->serial_number = NULL;
 	enum PSMove_Connection_Type type = psmove_connection_type(addr_struct->controller);
 	if (type == Conn_Bluetooth)
+	{
 		addr_struct->serial_number = psmove_get_serial(addr_struct->controller);
+		printf("Serial number: %s\n", addr_struct->serial_number);
+	}
 	else
+	{
 		addr_struct->serial_number = NULL;
+	}
 
 	addr_struct->counter = 0;
 }
@@ -39,6 +44,8 @@ void destroy(Game_Struct *addr_struct)
 int main (int argc, char **argv)
 {
 	int numControllers = atoi(argv[1]);
+	printf("Number of controllers: %d\n", numControllers);
+	// return 0;
 
 	Game_Struct **game_structs = NULL;
 	game_structs = (Game_Struct**) malloc(numControllers * sizeof(Game_Struct*));
