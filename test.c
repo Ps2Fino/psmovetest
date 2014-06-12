@@ -6,6 +6,8 @@
 
 #include "psmoveapi/psmove.h"
 
+#define GOAL 100
+
 enum State {
 	MOVE,
 	DONT_MOVE,
@@ -75,10 +77,6 @@ int main (int argc, char **argv)
 		init(i, &game_structs[i]);
 	}
 
-	// sleep(2);
-
-	printf("game_structs[0] serial_number: %s\n", game_structs[0].serial_number);
-
 	int doLoop = 1;
 	float x, y, z;
 	while(doLoop) {
@@ -109,10 +107,8 @@ int main (int argc, char **argv)
 					if (norm >= 2)
 					{
 						game_structs[i].counter += 0.1;
-						// char red = (char) floor(game_structs[i].counter);
-						// printf("Controller %d rising: %d\n", i, (int) red);
 					}
-					if (game_structs[i].counter > 20)
+					if (game_structs[i].counter > GOAL)
 					{
 						doLoop = 0;
 						break;
@@ -124,18 +120,19 @@ int main (int argc, char **argv)
 					}
 					psmove_set_leds(controller, (char) floor(game_structs[i].counter), 0, 0);
 					psmove_update_leds(controller);
-
-					// char red = (char) floor(game_structs[i].counter);
-					// printf("Controller %d descending: %d\n", i, (int) red);
 				}
 				else if (game_structs[i].state == DONT_MOVE)
 				{
+					// Rumble and turn blue
 					psmove_set_leds(controller, 0, 0, 255);
+					psmove_set_rumble(controller, 128);
 					psmove_update_leds(controller);
 
 					game_structs[i].dont_move_counter -= 0.02;
 					if (game_structs[i].dont_move_counter < 0)
 					{
+						psmove_set_rumble(controller, 0);
+						psmove_update_leds(controller);
 						game_structs[i].state = FINITO;
 					}
 				}
@@ -150,23 +147,32 @@ int main (int argc, char **argv)
 	for (int i = 0; i < numControllers; ++i)
 	{
 		printf("Counter: %.2f\n", game_structs[i].counter);
-		if (game_structs[i].counter >= 20)
+		if (game_structs[i].counter >= GOAL)
 		{
 			blink_controller = game_structs[i].controller;
 			break;
 		}
 	}
 
+	// Open up firefox and play a sound
+
+
 	// Flash green
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < 2; ++i)
 	{
+		psmove_set_rumble(blink_controller, 250);
 		psmove_set_leds(blink_controller, 0, 255, 0);
 		psmove_update_leds(blink_controller);
 		sleep(1);
+		psmove_set_rumble(blink_controller, 250);
 		psmove_set_leds(blink_controller, 255, 255, 255);
 		psmove_update_leds(blink_controller);
 		sleep(1);
 	}
+
+	// Stop the vibration
+	psmove_set_rumble(blink_controller, 0);
+	psmove_update_leds(blink_controller);
 
 	// Disconnect and free
 	for (int i = 0; i < numControllers; ++i)
