@@ -5,34 +5,43 @@
 
 #include "psmoveapi/psmove.h"
 
-enum Game_States {
-	CONNECT_CONTROLLERS,
-	PLAY_GAME,
-	TURN_OFF_APP
-};
+typedef struct game_struct {
+	PSMove *controller;
+	char *serial_number;
+
+} Game_Struct;
+
+void init(int id, Game_Struct *addr_struct)
+{
+	addr_struct = (Game_Struct*) malloc(sizeof(Game_Struct));
+	addr_struct->controller = (PSMove*) malloc(sizeof(PSMove));
+	addr_struct->controller = psmove_connect_by_id(id);
+
+	addr_struct->serial_number = psmove_get_serial(addr_struct->controller_1);
+}
 
 int main (int argc, char **argv)
 {
-	// Connect to one of the controllers
-	PSMove *controller_1 = NULL;
-	PSMove *controller_2 = NULL;
-	PSMove *controller_3 = NULL;
+	int numControllers = atoi(argv[1]);
 
-	controller_1 = psmove_connect_by_id(0);
-	controller_2 = psmove_connect_by_id(1);
-	controller_3 = psmove_connect_by_id(2);
+	Game_Struct *game_structs = NULL;
+	game_structs = (Game_Struct**) malloc(numControllers * sizeof(Game_Struct*));
 
-	// Write the bluetooth address of the controller to the terminal
-	enum PSMove_Connection_Type type = psmove_connection_type(controller_1);
-	type == Conn_Bluetooth ? printf("Connection type: bluetooth\n") : printf("Connection type: USB\n");
-
-	// enum PSMove_Battery_Level	
-
-	char *serial_number = NULL;
-	if (type == Conn_Bluetooth)
+	for (int i=0; i < numControllers; ++i)
 	{
-		serial_number = psmove_get_serial(controller_1);
-		printf("The serial number is: %s\n", serial_number);
+		game_structs[i] = (Game_Struct*) malloc(sizeof(Game_Struct));
+		game_structs[i]->controller = 
+		controllerArray[i] = psmove_connect_by_id(i);
+		// Write the bluetooth address of the controller to the terminal
+		enum PSMove_Connection_Type type = psmove_connection_type(controller_1);
+		type == Conn_Bluetooth ? printf("Connection type: bluetooth\n") : printf("Connection type: USB\n");
+
+		char *serial_number = NULL;
+		if (type == Conn_Bluetooth)
+		{
+			serial_number = psmove_get_serial(controller_1);
+			printf("The serial number is: %s\n", serial_number);
+		}
 	}
 
 	// psmove_enable_orientation(controller_1, PSMove_True);
