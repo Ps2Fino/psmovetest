@@ -23,7 +23,7 @@ typedef struct game_struct {
 	int dont_move_var;
 } Game_Struct;
 
-void init(int id, Game_Struct *addr_struct)
+void init(int id, Game_Struct *addr_struct, int *bluetooth)
 {
 	addr_struct->controller = NULL;
 	addr_struct->controller = psmove_connect_by_id(id);
@@ -38,6 +38,7 @@ void init(int id, Game_Struct *addr_struct)
 	else
 	{
 		addr_struct->serial_number = NULL;
+		*bluetooth = 0;
 	}
 
 	addr_struct->state = MOVE;
@@ -63,6 +64,12 @@ void print_debug(Game_Struct game_struct, int id)
 
 int main (int argc, char **argv)
 {
+	// If we've no controllers, call it a day
+	if (psmove_count_connected() <= 0)
+	{
+		printf("I need some controllers.....\n");
+		return 0;
+	}
 	// Set the seed for the rand gen
 	srand(time(NULL));
 	int numControllers = atoi(argv[1]);
@@ -72,9 +79,20 @@ int main (int argc, char **argv)
 	Game_Struct *game_structs = NULL;
 	game_structs = (Game_Struct*) malloc(numControllers * sizeof(Game_Struct));
 
+	int allBluetooth = 1;
 	for (int i=0; i < numControllers; ++i)
 	{
-		init(i, &game_structs[i]);
+		init(i, &game_structs[i], &allBluetooth);
+	}
+
+	if (allBluetooth == 0)
+	{
+		printf("All connections must be bluetooth\n");
+		for (int i=0; i < numControllers; ++i)
+		{
+			destroy(&game_structs[i]);
+		}
+		return 0;
 	}
 
 	int doLoop = 1;

@@ -9,17 +9,23 @@ CC=gcc
 PS_MOVE_API_HDR=$(PS_MOVE_ROOT)/include/
 PS_MOVE_API_LIB=$(PS_MOVE_ROOT)/lib/
 C_FLAGS=-c -Wall -I$(PS_MOVE_API_HDR)
-LD_FLAGS=-L$(PS_MOVE_API_LIB)
+LD_FLAGS=-L$(PS_MOVE_API_LIB) -headerpad_max_install_names
 PS_MOVE_API=-lpsmoveapi
 
-all: test
+all: ubiss-game
 	./run_change_tool.sh
 
-test: test.o
-	$(CC) test.o $(LD_FLAGS) $(PS_MOVE_API) -o test
+bin:
+	mkdir bin
+
+ubiss-game: test.o bin
+	$(CC) test.o $(LD_FLAGS) $(PS_MOVE_API) -o bin/ubiss-game
 
 test.o:	test.c
 	$(CC) $(C_FLAGS) test.c
 
+distclean:
+	rm -rf bin/
+
 clean:
-	rm *.o test
+	rm *.o
