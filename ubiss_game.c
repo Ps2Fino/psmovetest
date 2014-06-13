@@ -183,8 +183,8 @@ int main (int argc, char **argv)
 		}
 	}
 
-	// Open up firefox and play a sound
-
+	// Play the victory fanfare
+	system("afplay victory.mp3 &");
 
 	// Flash green
 	for (int i = 0; i < 2; ++i)

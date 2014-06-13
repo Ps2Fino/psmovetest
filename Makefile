@@ -12,17 +12,25 @@ C_FLAGS=-c -Wall -I$(PS_MOVE_API_HDR)
 LD_FLAGS=-L$(PS_MOVE_API_LIB) -headerpad_max_install_names
 PS_MOVE_API=-lpsmoveapi
 
-all: ubiss-game
-	./run_change_tool.sh
+all: ubiss_game set_color
+	./run_change_tool.sh bin/ubiss_game
+	./run_change_tool.sh bin/set_color
+	cp victory.mp3 bin/victory.mp3
 
 bin:
 	mkdir bin
 
-ubiss-game: test.o bin
-	$(CC) test.o $(LD_FLAGS) $(PS_MOVE_API) -o bin/ubiss-game
+ubiss_game: ubiss_game.o bin
+	$(CC) ubiss_game.o $(LD_FLAGS) $(PS_MOVE_API) -o bin/ubiss_game
 
-test.o:	test.c
-	$(CC) $(C_FLAGS) test.c
+set_color: set_color.o bin
+	$(CC) set_color.o $(LD_FLAGS) $(PS_MOVE_API) -o bin/set_color
+
+ubiss_game.o:	ubiss_game.c
+	$(CC) $(C_FLAGS) ubiss_game.c
+
+set_color.o: set_color.c
+	$(CC) $(C_FLAGS) set_color.c 
 
 distclean:
 	rm -rf bin/
