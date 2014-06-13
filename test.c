@@ -64,6 +64,12 @@ void print_debug(Game_Struct game_struct, int id)
 
 int main (int argc, char **argv)
 {
+	if (argc != 2)
+	{
+		printf("Usage: ubiss-game <players> where players is an int describing the number of players\n");
+		return 0;
+	}
+
 	// If we've no controllers, call it a day
 	if (psmove_count_connected() <= 0)
 	{
@@ -73,9 +79,14 @@ int main (int argc, char **argv)
 	// Set the seed for the rand gen
 	srand(time(NULL));
 	int numControllers = atoi(argv[1]);
-	printf("Number of controllers: %d\n", numControllers);
-	// return 0;
 
+	if (numControllers <= 0)
+	{
+		printf("I need at least one reindeer (ie one controller)\n");
+		return 0;
+	}
+
+	printf("Number of controllers: %d\n", numControllers);
 	Game_Struct *game_structs = NULL;
 	game_structs = (Game_Struct*) malloc(numControllers * sizeof(Game_Struct));
 
