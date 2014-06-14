@@ -1,2 +1,8 @@
 *.o
+<<<<<<< HEAD
 test
+=======
+bin/*
+test
+.DS_Store
+>>>>>>> release_candidate
