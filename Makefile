@@ -16,6 +16,10 @@ all: ubiss_game set_color
 	@echo Setting up the bin directory...
 	@cp $(ASSETS)/victory.mp3 bin/victory.mp3
 
+# Handy target for creating just the executable
+.PHONY: dist
+dist: all clean
+
 bin:
 	@mkdir bin
 
@@ -35,11 +39,13 @@ set_color.o: $(SRC)/set_color.c
 	@echo Compiling the sources for the set_color demo...
 	@$(CC) $(C_FLAGS) $(SRC)/set_color.c 
 
+.PHONY: distclean
 distclean:
-	@echo Full clean...
+	@echo Deleting everyting...
 	@rm -f *.o
 	@rm -rf bin/
 
+.PHONY: clean
 clean:
-	@echo Cleaning...
+	@echo Deleting all the intermediate binary files...
 	@rm -f *.o
