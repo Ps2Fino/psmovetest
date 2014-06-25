@@ -9,27 +9,37 @@ SRC=src/
 ASSETS=assets/
 
 all: ubiss_game set_color
-	utils/run_change_tool.sh bin/ubiss_game
-	utils/run_change_tool.sh bin/set_color
-	cp $(ASSETS)/victory.mp3 bin/victory.mp3
+	@echo Running utils/change_tool.sh on bin/ubiss_game...
+	@utils/run_change_tool.sh bin/ubiss_game
+	@echo Running utils/change_tool.sh on bin/set_color...
+	@utils/run_change_tool.sh bin/set_color
+	@echo Setting up the bin directory...
+	@cp $(ASSETS)/victory.mp3 bin/victory.mp3
 
 bin:
-	mkdir bin
+	@mkdir bin
 
 ubiss_game: ubiss_game.o bin
-	$(CC) ubiss_game.o $(LD_FLAGS) $(PS_MOVE_API) -o bin/ubiss_game
+	@echo Linking bin/ubiss_game with the PS Move library...
+	@$(CC) ubiss_game.o $(LD_FLAGS) $(PS_MOVE_API) -o bin/ubiss_game
 
 set_color: set_color.o bin
-	$(CC) set_color.o $(LD_FLAGS) $(PS_MOVE_API) -o bin/set_color
+	@echo Linking bin/set_color with the PS Move library...
+	@$(CC) set_color.o $(LD_FLAGS) $(PS_MOVE_API) -o bin/set_color
 
 ubiss_game.o:	$(SRC)/ubiss_game.c
-	$(CC) $(C_FLAGS) $(SRC)/ubiss_game.c
+	@echo Compiling the sources for the ubiss/game...
+	@$(CC) $(C_FLAGS) $(SRC)/ubiss_game.c
 
 set_color.o: $(SRC)/set_color.c
-	$(CC) $(C_FLAGS) $(SRC)/set_color.c 
+	@echo Compiling the sources for the set_color demo...
+	@$(CC) $(C_FLAGS) $(SRC)/set_color.c 
 
 distclean:
-	rm -rf bin/
+	@echo Full clean...
+	@rm -f *.o
+	@rm -rf bin/
 
 clean:
-	rm *.o
+	@echo Cleaning...
+	@rm -f *.o
