@@ -8,6 +8,7 @@ PS_MOVE_API=-lpsmoveapi
 SRC=src/
 ASSETS=assets/
 
+.PHONY: all
 all: ubiss_game set_color
 	@echo Running utils/change_tool.sh on bin/ubiss_game...
 	@utils/run_change_tool.sh bin/ubiss_game
